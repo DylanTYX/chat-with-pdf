@@ -67,7 +67,7 @@ function Chat({ id }: { id: string }) {
     });
 
     setMessages(newMessages);
-  }, [snapshot]);
+  }, [snapshot, messages.length]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

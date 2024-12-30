@@ -54,6 +54,7 @@ async function fetchMessagesFromDB(docId: string) {
 
 export async function generateDocs(docId: string) {
   const { userId } = await auth();
+
   if (!userId) {
     throw new Error("User not found");
   }
@@ -119,7 +120,7 @@ export async function generateEmbeddingsInPineconeVectorStore(docId: string) {
   const index = await pineconeClient.index(indexName);
   const namespaceAlreadyExists = await namespaceExists(index, docId);
 
-  if (!namespaceAlreadyExists) {
+  if (namespaceAlreadyExists) {
     console.log(
       `--- Namespace ${docId} already exist, reusing existing embeddings... ---`
     );

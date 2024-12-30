@@ -25,8 +25,8 @@ function PricingPage() {
     if (!user) return;
 
     const userDetails: UserDetails = {
-      email: user.primaryEmailAddress?.toString()!,
-      name: user.fullName!,
+      email: user.primaryEmailAddress?.toString() || "No email provided",
+      name: user.fullName || "No name provided",
     };
 
     startTransition(async () => {
