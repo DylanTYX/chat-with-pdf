@@ -5,8 +5,8 @@ import { auth } from "@clerk/nextjs/server";
 import { Message } from "@/components/Chat";
 import { generateLangchainCompletion } from "@/lib/langchain";
 
-const FREE_LIMIT = 3;
-const PRO_LIMIT = 100;
+const PRO_LIMIT = 20;
+const FREE_LIMIT = 2;
 
 export async function askQuestion(id: string, question: string) {
   auth.protect(); // Protect this route with Clerk
@@ -24,6 +24,30 @@ export async function askQuestion(id: string, question: string) {
   const userMessages = chatSnapshot.docs.filter(
     (doc) => doc.data().role === "human"
   );
+
+  // Check membership limits for messages in a document
+  const useRef = await adminDb.collection("users").doc(userId!).get();
+
+  // Limit the PRO/FREE users
+  // Check if user is on FREE plan and has asked more than the FREE number of questions
+  if (!useRef.data()?.hasActiveMembership) {
+    if (userMessages.length >= FREE_LIMIT) {
+      return {
+        success: false,
+        message: `You'll need to upgrade to PRO to ask more than ${FREE_LIMIT} questions!`,
+      };
+    }
+  }
+
+  // Check if user is on PRO plan and has asked more than 20 questions
+  if (useRef.data()?.hasActiveMembership) {
+    if (userMessages.length >= PRO_LIMIT) {
+      return {
+        success: false,
+        message: `You've reached the PRO limit of ${PRO_LIMIT} questions per document!`,
+      };
+    }
+  }
 
   const userMessage: Message = {
     role: "human",

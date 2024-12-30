@@ -58,7 +58,7 @@ export async function generateDocs(docId: string) {
     throw new Error("User not found");
   }
 
-  console.log("--- Fethcing the download URL from Firebase ---");
+  console.log("--- Fetching the download URL from Firebase ---");
   const firebaseRef = await adminDb
     .collection("users")
     .doc(userId)
